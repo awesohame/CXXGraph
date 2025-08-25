@@ -96,17 +96,38 @@ namespace CXXGraph {
             return result;
         }
 
-        // partition nodes into left (U) and right (V) sets
+        // partition nodes into left (U) and right (V) sets deterministically
+        // Sort nodes by ID to ensure consistent partitioning across platforms
         std::vector<shared<const Node<T>>> U, V;
+        std::vector<shared<const Node<T>>> coloredNodes;
+        
+        // collect all colored nodes
         for(const auto& node : nodes) {
             auto colorIt = color.find(node->getUserId());
             if(colorIt != color.end()) {
-                if(colorIt->second == 0) {
-                    U.push_back(node);
-                }
-                else {
-                    V.push_back(node);
-                }
+                coloredNodes.push_back(node);
+            }
+        }
+        
+        // sort nodes to ensure deterministic partitioning
+        std::sort(coloredNodes.begin(), coloredNodes.end(), 
+                  [](const shared<const Node<T>>& a, const shared<const Node<T>>& b) {
+                      return a->getUserId() < b->getUserId();
+                  });
+        
+        // determine which color should be assigned to U partition
+        // by checking the first node alphabetically - ensures consistency
+        int uColor = -1;
+        if(!coloredNodes.empty()) {
+            uColor = color[coloredNodes[0]->getUserId()];
+        }
+        
+        // assign nodes to partitions based on determined U color
+        for(const auto& node : coloredNodes) {
+            if(color[node->getUserId()] == uColor) {
+                U.push_back(node);
+            } else {
+                V.push_back(node);
             }
         }
 
