@@ -77,7 +77,13 @@ jobs:
     - name: Run Hopcroft-Karp test directly for debugging
       if: failure()
       working-directory: ${{github.workspace}}/build/test
-      run: ./test_exe --gtest_filter="*HopcroftKarp*" --gtest_print_time=1
+      shell: bash
+      run: |
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          ./Debug/test_exe.exe --gtest_filter="*HopcroftKarp*" --gtest_print_time=1
+        else
+          ./test_exe --gtest_filter="*HopcroftKarp*" --gtest_print_time=1
+        fi
 
     - name: Upload test logs on failure
       if: failure()
