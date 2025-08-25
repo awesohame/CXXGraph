@@ -2,7 +2,7 @@ name: CMake
 
 on:
   push:
-    branches: [ master, hopcroft-karp ]
+    branches: [ master, hopcroft-karp, test-macos-ci ]
   pull_request:
     branches: [ master ]
 env:
